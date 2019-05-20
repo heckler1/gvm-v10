@@ -53,7 +53,7 @@ usage () {
     echo "system-discovery"
     exit 1
   else
-    echo "Usage: ${APP_NAME} --ip <IP_ADDRESS> --ssh-username <USERNAME> --ssh-password <PASSWORD> --scan-name <NAME> --format <FORMAT_TYPE> --scan-type <SCAN_TYPE>"
+    echo "Usage: ${APP_NAME} --ip <IP_ADDRESS> --ssh-username <USERNAME> --ssh-password <PASSWORD> --scan-name <NAME> --report-format <FORMAT_TYPE> --scan-type <SCAN_TYPE>"
     exit 1
   fi
 }
@@ -89,7 +89,7 @@ else
         SCAN_NAME=${2}
         shift
         ;;
-      --format)
+      --report-format)
         REPORT_FORMAT=${2}
         shift
         ;;
