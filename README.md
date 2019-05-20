@@ -9,12 +9,20 @@ On every build, GVM is installed fresh with the latest NVTs. On every run, the N
 ## Launch
 
 ``` shell
+# Build the container
 docker build -t gvm-v10 .
-docker run -d -p 443:443 --name gvm gvm-v10:latest
-docker logs --follow gvm
-
-# Once NVTs are loaded, browse to https://localhost/
-# Default login / password: admin / admin
+# Run a scan
+docker run \
+  --rm \
+  --interactive \
+  --tty \
+  --volume $(pwd)/gvm_reports:/reports \
+  --name gvm \
+  gvm-v10:latest \
+    --ip 172.17.0.1 \
+    --scan-name test \
+    --scan-type full-and-fast \
+    --report-format pdf
 ```
 
 ## Set admin Password
