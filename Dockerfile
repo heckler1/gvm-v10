@@ -1,20 +1,12 @@
 FROM centos:7
 LABEL maintainer="stephen@sheckler.info"
 
-# Install our entrypoint
-ADD usr/local/sbin/run.sh /usr/local/sbin/run.sh
-
-# Install our configs
-ADD etc/redis.conf /etc/redis.conf
-ADD etc/yum.repos.d/texlive.repo /etc/yum.repos.d/texlive.repo
-ADD etc/sysconfig/gsad /etc/sysconfig/gsad
-
-# Add a script to update NVTs
-ADD usr/local/sbin/update_feeds.sh /usr/local/sbin/update_feeds.sh
-
 # Proxy optimization
 RUN sed -i "s/^mirrorlist/#mirrorlist/g" /etc/yum.repos.d/CentOS-Base.repo
 RUN sed -i "s/^#base/base/g" /etc/yum.repos.d/CentOS-Base.repo
+
+# Install the texlive repo
+ADD etc/yum.repos.d/texlive.repo /etc/yum.repos.d/texlive.repo
 
 # Install wget so that we can install the atomicorp repo
 # Install IUS for python3
@@ -64,11 +56,21 @@ RUN wget https://github.com/Arachni/arachni/releases/download/v1.5.1/arachni-1.5
 # More cleanp
 RUN rm -rf /var/cache/yum/*
 
+# Add a script to update NVTs
+ADD usr/local/sbin/update_feeds.sh /usr/local/sbin/update_feeds.sh
+
 # Get the latest NVTs/CERT/SCAP data
 RUN sh /usr/local/sbin/update_feeds.sh
 
-# We add our scan script at the end for quick modification on rebuild
+# Install our entrypoint
+ADD usr/local/sbin/run.sh /usr/local/sbin/run.sh
+
+# Install our configs
+ADD etc/redis.conf /etc/redis.conf
+ADD etc/sysconfig/gsad /etc/sysconfig/gsad
+
+# We add our scan script at the end for quick rebuild on modification
 ADD usr/local/sbin/run_scan.sh /usr/local/sbin/run_scan.sh
 
-CMD bash /usr/local/sbin/run.sh
+ENTRYPOINT [ "bash", "/usr/local/sbin/run.sh" ] 
 EXPOSE 443
