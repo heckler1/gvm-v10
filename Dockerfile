@@ -73,4 +73,3 @@ ADD etc/sysconfig/gsad /etc/sysconfig/gsad
 ADD usr/local/sbin/run_scan.sh /usr/local/sbin/run_scan.sh
 
 ENTRYPOINT [ "bash", "/usr/local/sbin/run.sh" ] 
-EXPOSE 443
