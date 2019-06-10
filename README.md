@@ -2,7 +2,7 @@
 
 This is a customized OpenVAS/Greebone Vulnerability Manager (GVM) v10 Docker container. It is based on the [Atomicorp Docker container](https://github.com/Atomicorp/openvas-docker), but at the time this repo was created, the Atomicorp image was running OpenVAS v9. However, this image is structured quite differently from the Atomicorp image.
 
-The notable differences in this image stem primarily from the fact that the image does not run a GVM server anymore. Instead, on invocation, the image runs a vulnerability scan using the provided options.
+The notable differences in this image stem primarily from the fact that the image does not run a GVM server anymore. Instead, on invocation, the image runs a vulnerability scan using the provided options, and then dies. This allows for ephemeral scanning, where the entire scan process is contained within the Docker container.
 
 On every build, GVM is installed fresh with the latest NVTs. On every run, the NVTs are updated. To prevent excessively long startup times, the container should be rebuilt regularly.
 
