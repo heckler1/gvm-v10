@@ -24,3 +24,21 @@ docker run \
     --scan-type full-and-fast \
     --report-format pdf
 ```
+
+## Server configuration
+
+The base of the gvm-v10 ephemeral scanning container can also be used for a long-running server, by building `Dockerfile.server`.
+
+``` shell
+# Build the container
+docker build -f Dockerfile.server -t gvm-server-v10 .
+# Run the server
+docker run \
+  --rm \
+  --detach \
+  --publish 127.0.0.1:443:443 \
+  --name gvm-server \
+  gvm-server-v10:latest
+# Monitor the logs
+docker logs -f gvm-server
+```
