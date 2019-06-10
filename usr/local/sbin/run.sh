@@ -74,25 +74,32 @@ else
 
 fi
 
-# Check for users, and create admin
-if [[ "$(gvmd --get-users)" = "" ]]
-then
-	echo "Setting up admin user..."
-	/usr/sbin/gvmd gvmd --create-user=admin
-	/usr/sbin/gvmd --user=admin --new-password="${GVM_PASSWORD}"
-fi
+echo "Waiting for server to finish starting..."
+# Monitor the logs for NVT cache build to be complete
+tail -fn0 /var/log/gvm/* |\
+while read -r line
+do
+	echo "${line}"
+	if (echo "${line}" | grep -q "Updating NVT cache... done")
+	then
+		echo "Server startup complete!"
+		# Check for users, and create admin
+		if [[ "$(gvmd --get-users)" = "" ]]
+		then
+			echo "Setting up admin user..."
+			/usr/sbin/gvmd --create-user=admin
+			/usr/sbin/gvmd --user=admin --new-password="${GVM_PASSWORD}"
+		fi
 
-# If the password is not the default value, we should reset it to what the user wants
-if [ "${GVM_PASSWORD}" != "admin" ]
-then
-	echo "Setting admin password..."
-	/usr/sbin/gvmd --user=admin --new-password="${GVM_PASSWORD}"
-fi
+		# If the password is not the default value, we should reset it to what the user wants
+		if [ "${GVM_PASSWORD}" != "admin" ]
+		then
+			echo "Setting admin password..."
+			/usr/sbin/gvmd --user=admin --new-password="${GVM_PASSWORD}"
+		fi
+		break
+	fi
+done
 
 
-if [ -z "${BUILD}" ]
-then
-	echo "Tailing logs..."
-	tail -F /var/log/gvm/*
-fi
-
+bash /usr/local/sbin/run_scan.sh "${@}"
