@@ -27,7 +27,7 @@ docker run \
 
 ## Server configuration
 
-The base of the gvm-v10 ephemeral scanning container can also be used for a long-running server, by building `Dockerfile.server`.
+The base of the gvm-v10 ephemeral scanning container can also be used for a long-running server, by building `Dockerfile.server`. The two containers share the majority of their layers, so ideally they should be built together to save time and disk space.
 
 ``` shell
 # Build the container
