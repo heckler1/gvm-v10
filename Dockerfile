@@ -2,8 +2,7 @@ FROM centos:7
 LABEL maintainer="stephen@sheckler.info"
 
 # Proxy optimization
-RUN sed -i "s/^mirrorlist/#mirrorlist/g" /etc/yum.repos.d/CentOS-Base.repo
-RUN sed -i "s/^#base/base/g" /etc/yum.repos.d/CentOS-Base.repo
+RUN sed -i "s/^mirrorlist/#mirrorlist/g;s/^#base/base/g" /etc/yum.repos.d/CentOS-Base.repo
 
 # Install the texlive repo
 ADD etc/yum.repos.d/texlive.repo /etc/yum.repos.d/texlive.repo
@@ -11,19 +10,15 @@ ADD etc/yum.repos.d/texlive.repo /etc/yum.repos.d/texlive.repo
 # Install wget so that we can install the atomicorp repo
 # Install IUS for python3
 RUN yum -y install wget \
-                   https://centos7.iuscommunity.org/ius-release.rpm
+                   https://centos7.iuscommunity.org/ius-release.rpm \
+    && yum clean all
 
 # Install the atomicorp repo, with default settings
 RUN cd /root; NON_INT=1 wget -q -O - https://updates.atomicorp.com/installers/atomic | sh
 
-# Cleanup a little
-RUN yum clean all
-
-# Update our container
-RUN yum -y update
-
-# Install GVM dependencies
-RUN yum -y install alien \
+# Update our container and install dependencies
+RUN yum -y update \
+    && yum -y install alien \
                    bzip2 \
                    useradd \
                    net-tools \
@@ -32,16 +27,17 @@ RUN yum -y install alien \
                    texlive-titlesec \
                    texlive-collection-latexextra \
                    python36u \
-                   python36u-pip
+                   python36u-pip \
+    && yum clean all
 
 # Prep dependencies
-RUN mkdir -p /usr/share/texlive/texmf-local/tex/latex/comment
-RUN texhash
+RUN mkdir -p /usr/share/texlive/texmf-local/tex/latex/comment && texhash
 
 # Install GVM
 RUN yum -y install greenbone-vulnerability-manager \
                    OSPd-nmap \
-                   OSPd
+                   OSPd \
+    && yum clean all
 
 # Install the GVM CLI
 RUN pip3.6 install gvm-tools
@@ -52,9 +48,6 @@ RUN wget https://github.com/Arachni/arachni/releases/download/v1.5.1/arachni-1.5
       && mv arachni-1.5.1-0.5.12 /opt/arachni \
       && ln -s /opt/arachni/bin/* /usr/local/bin/ \
       && rm -rf arachni*
-
-# More cleanp
-RUN rm -rf /var/cache/yum/*
 
 # Add a script to update NVTs
 ADD usr/local/sbin/update_feeds.sh /usr/local/sbin/update_feeds.sh
