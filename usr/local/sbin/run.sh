@@ -7,6 +7,27 @@ ADDRESS=127.0.0.1
 KEY_FILE=/var/lib/gvm/private/CA/clientkey.pem
 CERT_FILE=/var/lib/gvm/CA/clientcert.pem
 CA_FILE=/var/lib/gvm/CA/cacert.pem
+# Path to GVM's socket - This is the value for CentOS 7
+SOCKET_PATH="/var/run/gvmd.sock"
+
+# This function preps the container and starts a scan
+# We forward declare and run it later so that we can optionally skip this
+# and run the container as a long-running server instead
+function run_scan() {
+	echo "Adding non-root group..."
+	groupadd gvmgroup
+	echo "Adding non-root user..."
+	useradd -G gvmgroup gvmuser
+
+	if (timeout 15 chown gvmuser:gvmgroup ${SOCKET_PATH})
+	then
+		su -c "bash /usr/local/sbin/run_scan.sh ${*}" gvmuser
+	else
+		echo "Unable to set non-root ownership on gvmd socket; scan will fail. Exiting..."
+		exit 1
+	fi
+}
+
 
 # Start our redis server
 redis-server /etc/redis.conf &
@@ -101,5 +122,4 @@ do
 	fi
 done
 
-
-bash /usr/local/sbin/run_scan.sh "${@}"
+run_scan ${@}

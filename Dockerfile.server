@@ -63,7 +63,7 @@ ADD etc/redis.conf /etc/redis.conf
 ADD etc/sysconfig/gsad /etc/sysconfig/gsad
 
 # Don't run the scan script at the end of our entrypoint
-RUN sed -i '/bash \/usr\/local\/sbin\/run_scan.sh/d' /usr/local/sbin/run.sh
+RUN sed -i '/^run_scan/d' /usr/local/sbin/run.sh
 
 # Instead, monitor our logs
 RUN echo "tail -f /var/log/gvm/*" >> /usr/local/sbin/run.sh
